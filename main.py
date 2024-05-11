@@ -1,6 +1,6 @@
 from pygame import *
 from pygame.math import Vector2
-import sys
+import sys, random
 
 # Constants -> game colors
 GREEN = (173, 204, 96)
@@ -16,7 +16,7 @@ init()
 
 class Food:
     def __init__(self):
-        self.position = Vector2(5, 6)
+        self.position = self.generate_random_position()
 
     def draw(self):
         food_rect = Rect(
@@ -25,7 +25,14 @@ class Food:
             cell_size,
             cell_size,
         )
-        draw.rect(surface=screen, color=DARK_GREEN, rect=food_rect)
+        # Placing the food image onto the screen
+        screen.blit(food_graphics, food_rect)
+
+    def generate_random_position(self):
+        x_pos = random.randint(0, number_of_cells - 1)
+        y_pos = random.randint(0, number_of_cells - 1)
+        position = Vector2(x_pos, y_pos)
+        return position
 
 
 # Creating Canvas
@@ -33,6 +40,8 @@ screen = display.set_mode((cell_size * number_of_cells, cell_size * number_of_ce
 display.set_caption("Retro Snake Game")
 clock = time.Clock()
 food = Food()
+# loading custom food image
+food_graphics = image.load("retro-snake-game/Graphics/food.png")
 
 # Game loop
 while True:
