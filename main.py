@@ -18,7 +18,7 @@ class Food:
     def __init__(self):
         self.position = self.generate_random_position()
 
-    def draw(self):
+    def draw_food(self):
         food_rect = Rect(
             self.position.x * cell_size,
             self.position.y * cell_size,
@@ -35,11 +35,22 @@ class Food:
         return position
 
 
+class Snake:
+    def __init__(self):
+        self.body = [Vector2(6, 9), Vector2(5, 9), Vector2(4, 9)]
+
+    def draw_snake(self):
+        for part in self.body:
+            part_rect = (part.x * cell_size, part.y * cell_size, cell_size, cell_size)
+            draw.rect(screen, DARK_GREEN, part_rect, 0, 7)
+
+
 # Creating Canvas
 screen = display.set_mode((cell_size * number_of_cells, cell_size * number_of_cells))
 display.set_caption("Retro Snake Game")
 clock = time.Clock()
 food = Food()
+snake = Snake()
 # loading custom food image
 food_graphics = image.load("retro-snake-game/Graphics/food.png")
 
@@ -51,7 +62,8 @@ while True:
             sys.exit()
 
     screen.fill(GREEN)
-    food.draw()
+    food.draw_food()
+    snake.draw_snake()
 
     display.update()
     # Controlling frame rate (60)
