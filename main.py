@@ -15,8 +15,8 @@ init()
 
 
 class Food:
-    def __init__(self):
-        self.position = self.generate_random_position()
+    def __init__(self, snake_body):
+        self.position = self.generate_random_position(snake_body)
 
     def draw_food(self):
         # Food size config
@@ -29,10 +29,15 @@ class Food:
         # Placing the food image onto the screen
         screen.blit(food_graphics, food_rect)
 
-    def generate_random_position(self):
+    def generate_random_cell(self):
         x_pos = random.randint(0, number_of_cells - 1)
         y_pos = random.randint(0, number_of_cells - 1)
-        position = Vector2(x_pos, y_pos)
+        return Vector2(x_pos, y_pos)
+
+    def generate_random_position(self, snake_body):
+        position = self.generate_random_cell()
+        while position in snake_body:
+            position = self.generate_random_cell()
         return position
 
 
@@ -58,7 +63,7 @@ class Snake:
 class Game:
     def __init__(self):
         self.snake = Snake()
-        self.food = Food()
+        self.food = Food(self.snake.body)
 
     def draw(self):
         self.food.draw_food()
@@ -66,6 +71,11 @@ class Game:
 
     def update(self):
         self.snake.update()
+        self.check_food_collision()
+
+    def check_food_collision(self):
+        if self.snake.body[0] == self.food.position:
+            self.food.position = self.food.generate_random_position(self.snake.body)
 
 
 # Creating Canvas
