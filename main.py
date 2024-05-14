@@ -29,11 +29,13 @@ class Food:
         # Placing the food image onto the screen
         screen.blit(food_graphics, food_rect)
 
+    # Generates random x and y cell value
     def generate_random_cell(self):
         x_pos = random.randint(0, number_of_cells - 1)
         y_pos = random.randint(0, number_of_cells - 1)
         return Vector2(x_pos, y_pos)
 
+    # Generates random position which is not equal to snake's body position
     def generate_random_position(self, snake_body):
         position = self.generate_random_cell()
         while position in snake_body:
@@ -47,6 +49,7 @@ class Snake:
         self.body = [Vector2(6, 9), Vector2(5, 9), Vector2(4, 9)]
         # Starting direction
         self.direction = Vector2(1, 0)
+        self.add_part = False
 
     def draw_snake(self):
         for part in self.body:
@@ -54,28 +57,67 @@ class Snake:
             draw.rect(screen, DARK_GREEN, part_rect, 0, 7)
 
     def update(self):
-        # Slicing the body list to remove the last part
-        self.body = self.body[:-1]
-        # Adding new part based of direction
+        # Adding a new part based of direction
         self.body.insert(0, self.body[0] + self.direction)
+
+        # Changes the add_part value if the snake eats food
+        if self.add_part == True:
+            self.add_part = False
+
+        # Movement of the snake
+        else:
+            # Slicing the body list to remove the last part
+            self.body = self.body[:-1]
+
+    # Resets Vector2 values to defaults
+    def reset(self):
+        self.body = [Vector2(6, 9), Vector2(5, 9), Vector2(4, 9)]
+        self.direction = Vector2(1, 0)
 
 
 class Game:
     def __init__(self):
         self.snake = Snake()
         self.food = Food(self.snake.body)
+        # State of the game
+        self.game_is_running = True
 
     def draw(self):
         self.food.draw_food()
         self.snake.draw_snake()
 
     def update(self):
-        self.snake.update()
-        self.check_food_collision()
+        if self.game_is_running == True:
+            self.snake.update()
+            self.check_food_collision()
+            self.check_edge_collision()
+            self.check_tail_collision()
 
     def check_food_collision(self):
         if self.snake.body[0] == self.food.position:
+            # Creates new food position on screen
             self.food.position = self.food.generate_random_position(self.snake.body)
+            self.snake.add_part = True
+
+    def check_edge_collision(self):
+        # Checks snake's position with the borders of the game
+        if self.snake.body[0].x == number_of_cells or self.snake.body[0].x == -1:
+            self.game_over()
+        if self.snake.body[0].y == number_of_cells or self.snake.body[0].y == -1:
+            self.game_over()
+
+    def game_over(self):
+        # Resets the positions of snake and food and pauses the game
+        self.snake.reset()
+        self.food.position = self.food.generate_random_position(self.snake.body)
+        self.game_is_running = False
+
+    def check_tail_collision(self):
+        # Slicing the body list to get all the parts except the head
+        headless_body = self.snake.body[1:]
+        # checking if the head is equal to any part of the body
+        if self.snake.body[0] in headless_body:
+            self.game_over()
 
 
 # Creating Canvas
@@ -103,8 +145,13 @@ while True:
             quit()
             sys.exit()
 
-        # Checking for user input to change the direction of movement
+        # If any key is pressed
         if events.type == KEYDOWN:
+            # Unpausing the game
+            if game.game_is_running == False:
+                game.game_is_running = True
+
+            # Checking for user input to change the direction of movement
             if events.key == K_UP and game.snake.direction != Vector2(0, 1):
                 game.snake.direction = Vector2(0, -1)
             if events.key == K_DOWN and game.snake.direction != Vector2(0, -1):
@@ -118,6 +165,7 @@ while True:
     screen.fill(GREEN)
     game.draw()
 
+    # Updates the game with every iteration
     display.update()
     # Controlling frame rate (60)
     clock.tick(60)
