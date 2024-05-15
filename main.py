@@ -6,9 +6,10 @@ import sys, random
 GREEN = (173, 204, 96)
 DARK_GREEN = (43, 51, 24)
 
-# Cell config
+# Cell and border config
 cell_size = 30
 number_of_cells = 25
+OFFSET = 75
 
 # Initializing pygame
 init()
@@ -21,8 +22,8 @@ class Food:
     def draw_food(self):
         # Food size config
         food_rect = Rect(
-            self.position.x * cell_size,
-            self.position.y * cell_size,
+            OFFSET + self.position.x * cell_size,
+            OFFSET + self.position.y * cell_size,
             cell_size,
             cell_size,
         )
@@ -53,7 +54,12 @@ class Snake:
 
     def draw_snake(self):
         for part in self.body:
-            part_rect = (part.x * cell_size, part.y * cell_size, cell_size, cell_size)
+            part_rect = (
+                OFFSET + part.x * cell_size,
+                OFFSET + part.y * cell_size,
+                cell_size,
+                cell_size,
+            )
             draw.rect(screen, DARK_GREEN, part_rect, 0, 7)
 
     def update(self):
@@ -80,14 +86,14 @@ class Game:
         self.snake = Snake()
         self.food = Food(self.snake.body)
         # State of the game
-        self.game_is_running = True
+        self.is_running = True
 
     def draw(self):
         self.food.draw_food()
         self.snake.draw_snake()
 
     def update(self):
-        if self.game_is_running == True:
+        if self.is_running == True:
             self.snake.update()
             self.check_food_collision()
             self.check_edge_collision()
@@ -110,7 +116,7 @@ class Game:
         # Resets the positions of snake and food and pauses the game
         self.snake.reset()
         self.food.position = self.food.generate_random_position(self.snake.body)
-        self.game_is_running = False
+        self.is_running = False
 
     def check_tail_collision(self):
         # Slicing the body list to get all the parts except the head
@@ -121,7 +127,9 @@ class Game:
 
 
 # Creating Canvas
-screen = display.set_mode((cell_size * number_of_cells, cell_size * number_of_cells))
+screen = display.set_mode(
+    (2 * OFFSET + cell_size * number_of_cells, 2 * OFFSET + cell_size * number_of_cells)
+)
 display.set_caption("Retro Snake Game")
 
 clock = time.Clock()
@@ -148,8 +156,8 @@ while True:
         # If any key is pressed
         if events.type == KEYDOWN:
             # Unpausing the game
-            if game.game_is_running == False:
-                game.game_is_running = True
+            if game.is_running == False:
+                game.is_running = True
 
             # Checking for user input to change the direction of movement
             if events.key == K_UP and game.snake.direction != Vector2(0, 1):
@@ -163,9 +171,21 @@ while True:
 
     # Drawing on screen
     screen.fill(GREEN)
+    # Drawing a 5px border for the game
+    draw.rect(
+        screen,
+        DARK_GREEN,
+        (
+            OFFSET - 5,
+            OFFSET - 5,
+            cell_size * number_of_cells + 10,
+            cell_size * number_of_cells + 10,
+        ),
+        5,
+    )
     game.draw()
 
-    # Updates the game with every iteration
+    # Updates the game display with every iteration
     display.update()
     # Controlling frame rate (60)
     clock.tick(60)
