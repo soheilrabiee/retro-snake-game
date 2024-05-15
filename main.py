@@ -8,12 +8,15 @@ init()
 # Constants -> game colors
 GREEN = (173, 204, 96)
 DARK_GREEN = (43, 51, 24)
-TITLE_FONT = font.Font("./Graphics/ARCADECLASSIC.TTF", 60)
 
 # Cell and border config
 cell_size = 30
 number_of_cells = 25
 OFFSET = 75
+
+# Font objects
+title_font = font.Font("./Graphics/ARCADECLASSIC.TTF", 60)
+score_font = font.Font("./Graphics/ARCADECLASSIC.TTF", 35)
 
 
 class Food:
@@ -88,6 +91,7 @@ class Game:
         self.food = Food(self.snake.body)
         # State of the game
         self.is_running = True
+        self.score = 0
 
     def draw(self):
         self.food.draw_food()
@@ -105,6 +109,7 @@ class Game:
             # Creates new food position on screen
             self.food.position = self.food.generate_random_position(self.snake.body)
             self.snake.add_part = True
+            self.score += 1
 
     def check_edge_collision(self):
         # Checks snake's position with the borders of the game
@@ -118,6 +123,7 @@ class Game:
         self.snake.reset()
         self.food.position = self.food.generate_random_position(self.snake.body)
         self.is_running = False
+        self.score = 0
 
     def check_tail_collision(self):
         # Slicing the body list to get all the parts except the head
@@ -185,9 +191,11 @@ while True:
         5,
     )
     game.draw()
-    # Drawing game title
-    title_surface = TITLE_FONT.render("Retro  Snake", True, DARK_GREEN)
+    # Drawing game title and score
+    title_surface = title_font.render("Retro  Snake", True, DARK_GREEN)
+    score_surface = score_font.render(f"Score  {game.score}", True, DARK_GREEN)
     screen.blit(title_surface, (OFFSET + 5, 20))
+    screen.blit(score_surface, (OFFSET + 5, OFFSET + cell_size * number_of_cells + 10))
 
     # Updates the game display with every iteration
     display.update()
