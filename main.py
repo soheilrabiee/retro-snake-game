@@ -2,17 +2,18 @@ from pygame import *
 from pygame.math import Vector2
 import sys, random
 
+# Initializing pygame
+init()
+
 # Constants -> game colors
 GREEN = (173, 204, 96)
 DARK_GREEN = (43, 51, 24)
+TITLE_FONT = font.Font("./Graphics/ARCADECLASSIC.TTF", 60)
 
 # Cell and border config
 cell_size = 30
 number_of_cells = 25
 OFFSET = 75
-
-# Initializing pygame
-init()
 
 
 class Food:
@@ -141,7 +142,7 @@ SNAKE_UPDATE = USEREVENT
 time.set_timer(SNAKE_UPDATE, 200)
 
 # loading custom food image
-food_graphics = image.load("retro-snake-game/Graphics/food.png")
+food_graphics = image.load("./Graphics/food.png")
 
 # Game loop
 while True:
@@ -184,6 +185,9 @@ while True:
         5,
     )
     game.draw()
+    # Drawing game title
+    title_surface = TITLE_FONT.render("Retro  Snake", True, DARK_GREEN)
+    screen.blit(title_surface, (OFFSET + 5, 20))
 
     # Updates the game display with every iteration
     display.update()
