@@ -55,6 +55,8 @@ class Snake:
         # Starting direction
         self.direction = Vector2(1, 0)
         self.add_part = False
+        self.eat_sound = mixer.Sound("./Sounds/eat.mp3")
+        self.wall_hit_sound = mixer.Sound("./Sounds/wall.mp3")
 
     def draw_snake(self):
         for part in self.body:
@@ -110,6 +112,7 @@ class Game:
             self.food.position = self.food.generate_random_position(self.snake.body)
             self.snake.add_part = True
             self.score += 1
+            self.snake.eat_sound.play()
 
     def check_edge_collision(self):
         # Checks snake's position with the borders of the game
@@ -124,6 +127,7 @@ class Game:
         self.food.position = self.food.generate_random_position(self.snake.body)
         self.is_running = False
         self.score = 0
+        self.snake.wall_hit_sound.play()
 
     def check_tail_collision(self):
         # Slicing the body list to get all the parts except the head
